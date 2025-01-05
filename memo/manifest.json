@@ -8,6 +8,8 @@
     "default_popup": "popup/note.html"
   },
   "permissions": [
+    "tabs",
+    "activeTab",
     "storage"
   ],
   "content_scripts": [

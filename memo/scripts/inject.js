@@ -1,5 +1,19 @@
 const dataManager = (() => {
+    let domain = "";
     let dataList = [];
+
+    function setDomain (_callback) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            const currentUrl = new URL(tabs[0].url);
+            const currentDomain = currentUrl.hostname;  // 도메인 추출
+
+            if(!domain || domain != currentDomain) {
+                domain = currentDomain;
+            };
+
+            _callback();
+        });
+    }
 
     function appendElement () {
         let listParentDom = document.getElementById("noteList");
@@ -14,7 +28,6 @@ const dataManager = (() => {
                 liDom.setAttribute("data-index", ""+i);
                 liDom.setAttribute("id", "content");
                 listParentDom.append(liDom)
-
             }
         }
         else {
@@ -22,29 +35,27 @@ const dataManager = (() => {
             dom.text = "저장된 데이터가 없습니다.";
 
             listParentDom.append(dom)
-
         };
     }
 
-    function _init() {
+    function _init(_callback) {
         dataList = [];
+        setDomain(_callback);
     }
 
     function _load() {
-        this.init();
+        this.init(function () {
+            chrome.storage.local.get([domain], (data) => {
 
-        chrome.storage.local.get(["memo"], (data) => {
+                if(data[domain]?.memo?.length) {
+                    dataList = data[domain].memo.filter(v => v);
+                };
 
-            if(data.memo.length) {
-                dataList = data.memo.filter(v => v);
-            };
+                appendElement();
+            })
+        });
 
-            appendElement();
-        })
-    }
 
-    function _getData () {
-        return dataList;
     }
 
     function _deleteData(_index) {
@@ -52,7 +63,7 @@ const dataManager = (() => {
 
         dataList.splice(_index, 1)
 
-        chrome.storage.local.set({memo:dataList}, () => {
+        chrome.storage.local.set({[domain]: {memo:dataList}}, () => {
             this.load();
         })
     }
@@ -66,7 +77,7 @@ const dataManager = (() => {
 
         dataList.push(_text);
 
-        chrome.storage.local.set({memo:dataList}, () => {
+        chrome.storage.local.set({[domain]: {memo:dataList}}, () => {
             console.log("save memo data = " , dataList);
 
             document.getElementById("note").value = "";
@@ -75,7 +86,7 @@ const dataManager = (() => {
     }
 
     function _modifyData(_index, _text) {
-        const modifyData =  window.prompt(`수정 내용을 작성해 주세요 (${dataList[_index]})`);
+        const modifyData =  window.prompt(`수정 내용을 작성해 주세요 \n${dataList[_index]}`);
 
         if(modifyData === null) {
             alert("취소 되었습니다.")
@@ -85,19 +96,16 @@ const dataManager = (() => {
             alert("수정 된 내용이 없습니다. (스페이스바만 있어요)")
         };
 
-        if(modifyData.trim().length > 0) {
-            dataList[_index] = modifyData;
+        dataList[_index] = modifyData;
 
-            chrome.storage.local.set({memo:dataList}, () => {
-                this.load();
-            })
-        };
+        chrome.storage.local.set({[domain]: {memo:dataList}}, () => {
+            this.load();
+        })
     }
 
     return {
         init: _init,
         load: _load,
-        getData: _getData,
 
         deleteData: _deleteData,
         saveData: _saveData,
@@ -138,7 +146,9 @@ document.getElementById("addNote").addEventListener("click", (event) => {
 
             if(noteValue) {
                 if(!noteValue.value) {
-                    alert("저장할 내용이 없습니다.")
+                    alert("저장할 내용이 없습니다.");
+
+                    return;
                 };
 
                 dataManager.saveData(noteValue.value);
@@ -154,8 +164,3 @@ document.getElementById("addNote").addEventListener("click", (event) => {
 
 
 dataManager.load();
-
-
-
-
-console.log("script end");
