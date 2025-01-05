@@ -22,7 +22,7 @@ const dataManager = (() => {
     if (dataList) {
       for (let i = 0; i < dataList.length; i++) {
         const dom =
-          '<div style="display: flex"><p id="text">' +
+          '<div style="display: flex"><p id="text" style="margin-right: 10px">' +
           dataList[i] +
           '</p><button id="modify">수정</button><button id="delete">삭제</button></div>';
         let liDom = document.createElement('li');
@@ -89,10 +89,12 @@ const dataManager = (() => {
 
     if (modifyData === null) {
       alert('취소 되었습니다.');
+      return;
     }
 
     if (modifyData.trim().length === 0) {
       alert('수정 된 내용이 없습니다. (스페이스바만 있어요)');
+      return;
     }
 
     dataList[_index] = modifyData;
@@ -115,51 +117,49 @@ const dataManager = (() => {
 document.getElementById('noteList').addEventListener(
   'click',
   (event) => {
+    event.stopPropagation();
+
     const target = event?.target;
     const targetId = target?.id;
 
-    const contentDom = target?.closest('#content');
-    const index = contentDom.getAttribute('data-index') && +contentDom.getAttribute('data-index');
+    if (['modify', 'delete'].includes(targetId)) {
+      const contentDom = target?.closest('#content');
+      const index = contentDom.getAttribute('data-index') && +contentDom.getAttribute('data-index');
 
-    event.stopPropagation();
-
-    switch (targetId) {
-      case 'modify':
-        const text = target?.closest('#text')?.value;
-        dataManager.modifyData(index, text);
-        break;
-      case 'delete':
-        dataManager.deleteData(index);
-        break;
-      default:
-        console.log('정의되지 않음');
-        break;
+      switch (targetId) {
+        case 'modify':
+          const text = target?.closest('#text')?.value;
+          dataManager.modifyData(index, text);
+          break;
+        case 'delete':
+          dataManager.deleteData(index);
+          break;
+      }
     }
   },
   true,
 );
 
 document.getElementById('addNote').addEventListener('click', (event) => {
+  event.stopPropagation();
   const target = event?.target?.id;
 
-  switch (target) {
-    case 'save':
-      const noteValue = document.getElementById('note');
+  if (target === 'save') {
+    switch (target) {
+      case 'save':
+        const noteValue = document.getElementById('note');
 
-      if (noteValue) {
-        if (!noteValue.value) {
-          alert('저장할 내용이 없습니다.');
+        if (noteValue) {
+          if (!noteValue.value) {
+            alert('저장할 내용이 없습니다.');
 
-          return;
+            return;
+          }
+
+          dataManager.saveData(noteValue.value);
         }
-
-        dataManager.saveData(noteValue.value);
-      }
-
-      break;
-    default:
-      console.log('정의되지 않음');
-      break;
+        break;
+    }
   }
 });
 
