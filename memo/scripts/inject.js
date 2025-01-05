@@ -7,10 +7,12 @@ const dataManager = (() => {
 
         if(dataList) {
             for(let i = 0; i < dataList.length; i++) {
-                const dom = '<li id="content" data-index = "'+i+'"> <div style="display: flex"><p id="text">'+dataList[i]+'</p><button id="modify">수정</button><button id="delete">삭제</button></div></li>';
+                const dom = '<div style="display: flex"><p id="text">'+dataList[i]+'</p><button id="modify">수정</button><button id="delete">삭제</button></div>';
                 let liDom = document.createElement("li");
 
                 liDom.innerHTML = dom.trim();
+                liDom.setAttribute("data-index", ""+i);
+                liDom.setAttribute("id", "content");
                 listParentDom.append(liDom)
 
             }
