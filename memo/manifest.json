@@ -1,0 +1,19 @@
+{
+  "name": "site note!",
+  "description": "site note",
+  "version": "0.1",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "page note",
+    "default_popup": "popup/note.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["scripts/inject.js"]
+    }
+  ]
+}
