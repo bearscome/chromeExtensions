@@ -114,7 +114,7 @@ const dataManager = (() => {
   };
 })();
 
-document.getElementById('noteList').addEventListener(
+document.getElementById('noteList')?.addEventListener(
   'click',
   (event) => {
     event.stopPropagation();
@@ -140,7 +140,7 @@ document.getElementById('noteList').addEventListener(
   true,
 );
 
-document.getElementById('addNote').addEventListener('click', (event) => {
+document.getElementById('addNote')?.addEventListener('click', (event) => {
   event.stopPropagation();
   const target = event?.target?.id;
 
