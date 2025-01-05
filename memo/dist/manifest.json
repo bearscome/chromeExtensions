@@ -1,0 +1,21 @@
+{
+  "name": "site note!",
+  "description": "site note",
+  "version": "0.1",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "page note",
+    "default_popup": "memo.html"
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["script.js"]
+    }
+  ]
+}

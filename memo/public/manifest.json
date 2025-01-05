@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "action": {
     "default_title": "page note",
-    "default_popup": "popup/note.html"
+    "default_popup": "memo.html"
   },
   "permissions": [
     "tabs",
